@@ -1,0 +1,7 @@
+node_modules/
+*.db
+*.db-shm
+*.db-wal
+# 설치할 때 빌드하는 캘린더 앱과 하루 한 번 알림 표시
+skills/gtd/sources/macos-calendar/CalendarEvents.app/
+skills/gtd/scripts/.nudged

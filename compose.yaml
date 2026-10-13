@@ -1,0 +1,56 @@
+# Docker 방식: Mindwtr 데스크톱 앱 대신 이 PC 의 Docker 에서 Mindwtr 를 띄웁니다. 데스크톱 앱 방식이면 쓰지 않습니다.
+# 토큰을 키체인에서 읽어 넘기므로 직접 띄우지 말고 `bun skills/gtd/scripts/setup.ts docker` 로 띄웁니다.
+# 포트는 모두 이 PC 안(127.0.0.1)에서만 열리고, 데이터는 레포 밖(GTD_DATA_DIR, 기본 ~/.local/share/gtd)에 둡니다.
+name: gtd
+
+services:
+  # 할 일 데이터를 저장하는 동기화 서버. 웹 화면·데스크톱·모바일 앱이 여기에 동기화합니다.
+  mindwtr-cloud:
+    image: ghcr.io/dongdongbh/mindwtr-cloud:latest
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:8787:8787
+    environment:
+      MINDWTR_CLOUD_AUTH_TOKENS: ${MINDWTR_CLOUD_TOKEN:?setup.ts docker 로 띄워 주세요}
+      MINDWTR_CLOUD_CORS_ORIGIN: http://localhost:5173
+    volumes:
+      - ${GTD_DATA_DIR:?setup.ts docker 로 띄워 주세요}:/app/cloud_data
+
+  # 브라우저에서 쓰는 화면(PWA). 처음 열 때 Settings → Sync → Self-Hosted 에 서버 주소와 토큰을 넣습니다.
+  mindwtr-app:
+    image: ghcr.io/dongdongbh/mindwtr-app:latest
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5173:5173
+    depends_on:
+      - mindwtr-cloud
+
+  # Claude 가 붙는 MCP. 동기화 서버를 읽고 씁니다. 데스크톱 앱 내장 MCP(8722)와 겹치지 않게 8723 을 씁니다.
+  mindwtr-mcp:
+    image: node:22-alpine
+    restart: unless-stopped
+    command:
+      - npx
+      - -y
+      - mindwtr-mcp@1.1.12
+      - --cloud-url
+      - http://mindwtr-cloud:8787
+      - --cloud-allow-insecure-http=true
+      - --write
+      - --http
+      - --http-host
+      - 0.0.0.0
+      - --http-port
+      - '8723'
+    environment:
+      MINDWTR_MCP_CLOUD_TOKEN: ${MINDWTR_CLOUD_TOKEN:?setup.ts docker 로 띄워 주세요}
+      MINDWTR_MCP_HTTP_TOKEN: ${MINDWTR_MCP_HTTP_TOKEN:?setup.ts docker 로 띄워 주세요}
+    ports:
+      - 127.0.0.1:8723:8723
+    volumes:
+      - npm-cache:/root/.npm
+    depends_on:
+      - mindwtr-cloud
+
+volumes:
+  npm-cache:
