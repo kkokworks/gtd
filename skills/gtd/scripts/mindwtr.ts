@@ -13,6 +13,8 @@ export type Task = {
   createdAt: string
   updatedAt: string
   description?: string
+  projectId?: string
+  attachments?: { title?: string; uri: string }[]
   deletedAt?: string
   dueDate?: string
   isFocusedToday?: boolean
@@ -20,6 +22,17 @@ export type Task = {
 }
 // 결과의 모양은 도구마다 다르므로 부르는 쪽이 T 로 적습니다(예: tool<{ tasks: Task[] }>('mindwtr_list_tasks', …)).
 export type Tool = <T = unknown>(name: string, args: unknown) => Promise<T>
+// 제목·설명·링크가 이슈 키를 언급하는가. ENG-12 가 ENG-123 이나 XENG-12 에 걸리지 않게 앞뒤를 끊어 봅니다.
+export function mentionsIssue(issue: string): (t: Task) => boolean {
+  const escaped = issue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const key = new RegExp(`(?<![\\w-])${escaped}(?![\\w-])`)
+  return (t) =>
+    key.test(
+      [t.title, t.description, ...(t.attachments ?? []).flatMap((a) => [a.title, a.uri])].join(
+        '\n',
+      ),
+    )
+}
 type RpcResponse = {
   result?: { isError?: boolean; content: { text: string }[] }
   error?: unknown

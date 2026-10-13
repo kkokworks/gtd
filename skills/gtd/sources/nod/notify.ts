@@ -5,7 +5,7 @@
 // - 답하면 그 결정을 체크하고 다시 nod 대기로 돌립니다.
 // - 작업이 끝나면 그 항목을 완료(성공)하거나 취소(취소)합니다.
 // Mindwtr 가 꺼져 있으면 실패로 끝나고, nod 는 stderr 에 남깁니다(장부에는 그대로 있음).
-import { connect, type Task } from '../../scripts/mindwtr'
+import { connect, mentionsIssue, type Task } from '../../scripts/mindwtr'
 
 const REASON: Record<string, string> = {
   question: '질문',
@@ -38,11 +38,18 @@ async function openTasks(match: (t: Task) => boolean): Promise<Task[]> {
   )
 }
 
-// 맡길 때 세션이 항목을 만들지 않았으면 여기서 만듭니다. 제목 앞의 이슈 번호로 같은 이슈끼리 모여 보입니다.
+// 맡길 때 세션이 항목을 만들지 않았으면 여기서 만듭니다. 제목 앞의 이슈 번호로 같은 이슈끼리 모여 보이고,
+// 같은 이슈의 할 일이 든 프로젝트(업무 묶음)가 있으면 그 프로젝트에 넣습니다.
 async function workTask(task: { id: number; brief: string; issue: string | null }): Promise<Task> {
   const found = (await openTasks(markedFor(task.id)))[0]
   if (found) return found
+  const issue = task.issue
+  const sibling =
+    issue === null
+      ? undefined
+      : (await openTasks((t) => !!t.projectId && mentionsIssue(issue)(t)))[0]
   await tool('mindwtr_add_task', {
+    projectId: sibling?.projectId,
     title: `${task.issue === null ? '' : `${task.issue} `}nod #${task.id}: ${firstLine(task.brief, 60)}`,
     status: 'waiting',
     assignedTo: 'nod',
