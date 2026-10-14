@@ -27,6 +27,7 @@ Mindwtr 가 믿을 수 있는 시스템이고 이 세션은 비서입니다. 머
 | 내일 준비 (사람이 부를 때, 정해진 시각에 사람 없이 돌 때) | [tomorrow.md](tomorrow.md) |
 | 주간 리뷰 | [review.md](review.md) |
 | 프로젝트 하나를 맡아 nod 로 굴리기 (루트 세션, nod 를 켰을 때) | [sources/nod/root.md](sources/nod/root.md) |
+| 이미 있는 항목의 첨부 링크 바꾸기 (데스크톱 앱 방식) | [local-api.md](local-api.md) |
 | 업무 도구 켜기·끄기·더하기 | [sources/README.md](sources/README.md) |
 | 처음 설정, 도구가 없거나 연결이 안 될 때 | [setup.md](setup.md) |
 
