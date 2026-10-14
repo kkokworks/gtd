@@ -26,6 +26,7 @@
 |---|---|
 | [slack](slack/SOURCE.md) | "나중에" 저장, 안 읽은 멘션·DM, 스레드 회신 |
 | [linear](linear/SOURCE.md) | 나에게 배정된 이슈와 알림 |
+| [plane](plane/SOURCE.md) | 나에게 배정된 이슈, 이슈에 댓글 남기기 |
 | [github](github/SOURCE.md) | 리뷰 요청, 내가 연 PR |
 | [forgejo](forgejo/SOURCE.md) | 리뷰 요청, 내가 연 PR, 내가 맡은 레포의 CI |
 | [macos-calendar](macos-calendar/SOURCE.md) | macOS 캘린더 일정(구글 캘린더도 계정을 붙이면 함께) |

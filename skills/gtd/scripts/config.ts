@@ -7,6 +7,8 @@ export type Config = {
   sources: string[]
   mindwtr: { mcpUrl: string }
   forgejo?: { org: string; maintainerFile?: string; maintainerKey?: string }
+  // projects 는 훑을 프로젝트 식별자입니다(이슈 키 ENG-12 의 ENG).
+  plane?: { url: string; workspace: string; projects: string[] }
 }
 
 export async function loadConfig(): Promise<Config> {
